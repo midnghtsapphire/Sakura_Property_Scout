@@ -2,7 +2,7 @@ name: Sync verified Neon data
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,13 +16,13 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client jq
-
-      - name: Verify Neon connection secret
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exporter dependency
+        run: pip install 'psycopg[binary]>=3.2,<4'
+      - name: Verify Neon secret
         env:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: |
@@ -30,111 +30,21 @@ jobs:
             echo "Missing repository secret NEON_DATABASE_URL"
             exit 1
           fi
-
-      - name: Export verified public data from Neon
+      - name: Export properties, grants and intelligence
         env:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: python scripts/export_neon.py
+      - name: Write sync status
         run: |
-          mkdir -p data
-
-          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
-            SELECT COALESCE(
-              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.price, x.address)),
-              '[]'::jsonb
-            )
-            FROM (
-              SELECT
-                p.property_id AS \"propertyId\",
-                p.address,
-                trim(concat_ws(', ', p.city, p.state)) AS market,
-                p.property_type AS type,
-                p.asking_price AS price,
-                p.lot_rent_monthly AS \"lotRent\",
-                p.bedrooms AS beds,
-                p.bathrooms AS baths,
-                p.sqft,
-                p.year_built AS \"yearBuilt\",
-                p.listing_source AS source,
-                p.listing_url AS url,
-                p.data_status AS status,
-                p.source_checked_at AS \"sourceChecked\",
-                p.land_owned AS \"landOwned\",
-                p.target_offer AS \"targetOffer\",
-                p.max_offer AS \"maxOffer\",
-                p.notes AS note
-              FROM properties p
-              WHERE p.data_status IN ('LIVE','VERIFIED')
-            ) x;
-          " > data/properties.json
-
-          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
-            SELECT COALESCE(
-              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.geography, x.name)),
-              '[]'::jsonb
-            )
-            FROM (
-              SELECT
-                g.grant_id AS \"grantId\",
-                g.name,
-                g.agency,
-                g.program_url AS url,
-                g.geography,
-                g.program_type AS \"programType\",
-                g.max_amount AS \"maxAmount\",
-                g.funding_form AS \"fundingForm\",
-                g.applicant_requirements AS \"applicantRequirements\",
-                g.property_requirements AS \"propertyRequirements\",
-                g.stacking_notes AS \"stackingNotes\",
-                g.application_status AS \"applicationStatus\",
-                g.open_date AS \"openDate\",
-                g.close_date AS \"closeDate\",
-                g.verified_at AS \"verifiedAt\",
-                g.data_status AS \"dataStatus\",
-                g.notes AS note
-              FROM grants g
-              WHERE g.data_status = 'VERIFIED'
-            ) x;
-          " > data/grants.json
-
-          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
-            SELECT COALESCE(
-              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.state, x.name)),
-              '[]'::jsonb
-            )
-            FROM (
-              SELECT
-                m.market_id AS \"marketId\",
-                m.name,
-                m.state,
-                m.region,
-                m.market_type AS \"marketType\",
-                m.latitude,
-                m.longitude,
-                m.data_status AS \"dataStatus\",
-                m.notes AS note
-              FROM markets m
-              WHERE m.active = true AND m.data_status = 'VERIFIED'
-            ) x;
-          " > data/markets.json
-
-          jq empty data/properties.json
-          jq empty data/grants.json
-          jq empty data/markets.json
-
-          jq -n \
-            --arg generated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-            --arg source "Neon Postgres" \
-            '{generatedAt:$generated_at,source:$source,status:"verified-export"}' \
-            > data/sync-status.json
-
+          printf '{"generatedAt":"%s","source":"Neon Postgres","status":"verified-export"}\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" > data/sync-status.json
       - name: Commit changed data snapshots
         run: |
           if git diff --quiet -- data/; then
-            echo "No verified-data changes."
+            echo "No data changes."
             exit 0
           fi
           git config user.name "sakura-sync[bot]"
           git config user.email "sakura-sync[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "chore: sync verified Neon data"
+          git commit -m "chore: sync Neon property intelligence"
           git push
