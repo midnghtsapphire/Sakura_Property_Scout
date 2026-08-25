@@ -1,0 +1,134 @@
+name: Sync verified Neon data
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: neon-data-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client jq
+
+      - name: Verify Neon connection secret
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          if [ -z "$NEON_DATABASE_URL" ]; then
+            echo "Missing repository secret NEON_DATABASE_URL"
+            exit 1
+          fi
+
+      - name: Export verified public data from Neon
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          mkdir -p data
+
+          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            SELECT COALESCE(
+              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.asking_price, x.address)),
+              '[]'::jsonb
+            )
+            FROM (
+              SELECT
+                property_id,
+                address,
+                city,
+                state,
+                postal_code,
+                listing_url,
+                listing_source,
+                property_type,
+                asking_price,
+                target_offer,
+                max_offer,
+                lot_rent_monthly,
+                land_owned,
+                bedrooms,
+                bathrooms,
+                sqft,
+                year_built,
+                status,
+                data_status,
+                source_checked_at,
+                notes
+              FROM properties
+              WHERE data_status IN ('LIVE','VERIFIED')
+            ) x;
+          " > data/properties.json
+
+          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            SELECT COALESCE(
+              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.geography, x.name)),
+              '[]'::jsonb
+            )
+            FROM (
+              SELECT
+                grant_id,
+                name,
+                agency,
+                program_url,
+                geography,
+                program_type,
+                max_amount,
+                funding_form,
+                applicant_requirements,
+                property_requirements,
+                stacking_notes,
+                application_status,
+                open_date,
+                close_date,
+                verified_at,
+                data_status,
+                notes
+              FROM grants
+              WHERE data_status = 'VERIFIED'
+            ) x;
+          " > data/grants.json
+
+          psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            SELECT COALESCE(
+              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.state, x.name)),
+              '[]'::jsonb
+            )
+            FROM (
+              SELECT market_id, name, state, region, market_type, latitude, longitude, data_status, notes
+              FROM markets
+              WHERE active = true AND data_status = 'VERIFIED'
+            ) x;
+          " > data/markets.json
+
+          jq empty data/properties.json
+          jq empty data/grants.json
+          jq empty data/markets.json
+
+          jq -n \
+            --arg generated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            --arg source "Neon Postgres" \
+            '{generated_at:$generated_at,source:$source,status:"verified-export"}' \
+            > data/sync-status.json
+
+      - name: Commit changed data snapshots
+        run: |
+          if git diff --quiet -- data/; then
+            echo "No verified-data changes."
+            exit 0
+          fi
+          git config user.name "sakura-sync[bot]"
+          git config user.email "sakura-sync[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "chore: sync verified Neon data"
+          git push
