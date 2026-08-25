@@ -11,7 +11,7 @@
     "dataStatus": "VERIFIED",
     "verifiedAt": "2026-08-24",
     "url": "https://www.ura.org/pages/homeowner-assistance-program",
-    "note": "Current URA page says the application round closed March 14, 2025. Keep for reopening/recurrence monitoring."
+    "note": "Current URA page says the application round is closed. Keep for reopening and recurrence monitoring."
   },
   {
     "id": 4,
@@ -25,7 +25,7 @@
     "dataStatus": "VERIFIED",
     "verifiedAt": "2026-08-24",
     "url": "https://www.ura.org/pages/OwnPGH",
-    "note": "URA says it is no longer accepting applications. Retained as historical program intelligence and for successor/reopening monitoring."
+    "note": "Historical high-value Pittsburgh program. Do not count toward a current stack unless URA reopens or replaces it."
   },
   {
     "id": 5,
@@ -39,7 +39,7 @@
     "dataStatus": "VERIFIED",
     "verifiedAt": "2026-08-24",
     "url": "https://www.phfa.org/programs/purchase/kflex.aspx",
-    "note": "Current PHFA program page verified. Property and borrower eligibility still must be checked before counting funds in a stack."
+    "note": "Up to $30,000 of eligible repairs; transaction-specific PHFA and K-FIT requirements still apply."
   },
   {
     "id": 6,
@@ -53,7 +53,7 @@
     "dataStatus": "VERIFIED",
     "verifiedAt": "2026-08-24",
     "url": "https://www.phfa.org/programs/assistance/kfit.aspx",
-    "note": "Current K-FIT page verified. Amount depends on the qualifying transaction rather than a single flat maximum stored here."
+    "note": "Assistance is based on the qualifying transaction rather than a single flat maximum."
   },
   {
     "id": 7,
@@ -67,6 +67,62 @@
     "dataStatus": "VERIFIED",
     "verifiedAt": "2026-08-24",
     "url": "https://www.ura.org/news/ura-accepting-applications-for-the-home-accessibility-program-for-independence",
-    "note": "The 2026 application period ran through July 31, 2026. Monitor for a later round."
+    "note": "The 2026 application round ended July 31, 2026. Monitor for another round."
+  },
+  {
+    "id": 8,
+    "name": "Down Payment and Closing Cost Assistance Program",
+    "agency": "Urban Redevelopment Authority of Pittsburgh",
+    "geography": "City of Pittsburgh, PA",
+    "programType": "Down payment / closing cost",
+    "maxAmount": 7500,
+    "fundingForm": "0% deferred loan",
+    "applicationStatus": "ACTIVE",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-25",
+    "url": "https://www.ura.org/pages/down-payment-and-closing-cost-assistance-program",
+    "note": "Up to $7,500 for qualifying first-time buyers below 80% AMI and up to $5,000 for qualifying buyers between 80% and 115% AMI."
+  },
+  {
+    "id": 9,
+    "name": "Strengthen Mississippi Homes",
+    "agency": "Mississippi Insurance Department",
+    "geography": "Mississippi Gulf Coast - 2026 MWUA rollout",
+    "programType": "FORTIFIED roof mitigation",
+    "maxAmount": 10000,
+    "fundingForm": "Grant",
+    "applicationStatus": "LIMITED",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-25",
+    "url": "https://www.mid.ms.gov/mississippi-insurance-department/preparedness/mitigation/smh/",
+    "note": "Current 2026 interest forms are limited to qualifying MWUA Wind Pool policyholders in Hancock, Harrison and Jackson counties. Owner-occupied single-family primary residences only; mobile homes and rentals do not qualify."
+  },
+  {
+    "id": 10,
+    "name": "Section 504 Home Repair Loans & Grants - Mississippi",
+    "agency": "USDA Rural Development",
+    "geography": "Eligible rural areas of Mississippi",
+    "programType": "Repair / health and safety",
+    "maxAmount": 10000,
+    "fundingForm": "Grant plus 1% repair loan",
+    "applicationStatus": "ACTIVE",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-25",
+    "url": "https://www.rd.usda.gov/programs-services/single-family-housing-programs/single-family-housing-repair-loans-grants-34",
+    "note": "Standard maximum grant is $10,000 for qualifying applicants; repair loans can reach $40,000 and may be combined with grants. Exact household and rural-address eligibility must be verified."
+  },
+  {
+    "id": 11,
+    "name": "Section 504 Home Repair Loans & Grants - Pennsylvania",
+    "agency": "USDA Rural Development",
+    "geography": "Eligible rural areas of Pennsylvania",
+    "programType": "Repair / health and safety",
+    "maxAmount": 10000,
+    "fundingForm": "Grant plus 1% repair loan",
+    "applicationStatus": "ACTIVE",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-25",
+    "url": "https://www.rd.usda.gov/programs-services/single-family-housing-programs/single-family-housing-repair-loans-grants",
+    "note": "Useful for rural Western Pennsylvania rather than Pittsburgh proper. Exact address and applicant eligibility must be verified before counting it in a stack."
   }
 ]
