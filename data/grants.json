@@ -1,0 +1,72 @@
+[
+  {
+    "id": 3,
+    "name": "Homeowner Assistance Program",
+    "agency": "Urban Redevelopment Authority of Pittsburgh",
+    "geography": "City of Pittsburgh, PA",
+    "programType": "Rehabilitation",
+    "maxAmount": 35000,
+    "fundingForm": "Grant",
+    "applicationStatus": "CLOSED",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-24",
+    "url": "https://www.ura.org/pages/homeowner-assistance-program",
+    "note": "Current URA page says the application round closed March 14, 2025. Keep for reopening/recurrence monitoring."
+  },
+  {
+    "id": 4,
+    "name": "OwnPGH Homeownership Program",
+    "agency": "Urban Redevelopment Authority of Pittsburgh",
+    "geography": "City of Pittsburgh, PA",
+    "programType": "Home purchase",
+    "maxAmount": 90000,
+    "fundingForm": "Grant / assistance",
+    "applicationStatus": "CLOSED",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-24",
+    "url": "https://www.ura.org/pages/OwnPGH",
+    "note": "URA says it is no longer accepting applications. Retained as historical program intelligence and for successor/reopening monitoring."
+  },
+  {
+    "id": 5,
+    "name": "Keystone Flex Purchase & Improvement with K-FIT",
+    "agency": "Pennsylvania Housing Finance Agency",
+    "geography": "Pennsylvania",
+    "programType": "Purchase + rehabilitation",
+    "maxAmount": 30000,
+    "fundingForm": "Mortgage repair funds plus forgivable assistance",
+    "applicationStatus": "ACTIVE",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-24",
+    "url": "https://www.phfa.org/programs/purchase/kflex.aspx",
+    "note": "Current PHFA program page verified. Property and borrower eligibility still must be checked before counting funds in a stack."
+  },
+  {
+    "id": 6,
+    "name": "Keystone Forgivable in Ten Years (K-FIT)",
+    "agency": "Pennsylvania Housing Finance Agency",
+    "geography": "Pennsylvania",
+    "programType": "Down payment / closing cost",
+    "maxAmount": null,
+    "fundingForm": "Forgivable second mortgage",
+    "applicationStatus": "ACTIVE",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-24",
+    "url": "https://www.phfa.org/programs/assistance/kfit.aspx",
+    "note": "Current K-FIT page verified. Amount depends on the qualifying transaction rather than a single flat maximum stored here."
+  },
+  {
+    "id": 7,
+    "name": "Home Accessibility Program for Independence (HAPI)",
+    "agency": "Urban Redevelopment Authority of Pittsburgh",
+    "geography": "City of Pittsburgh, PA",
+    "programType": "Accessibility rehabilitation",
+    "maxAmount": 15000,
+    "fundingForm": "Grant",
+    "applicationStatus": "CLOSED",
+    "dataStatus": "VERIFIED",
+    "verifiedAt": "2026-08-24",
+    "url": "https://www.ura.org/news/ura-accepting-applications-for-the-home-accessibility-program-for-independence",
+    "note": "The 2026 application period ran through July 31, 2026. Monitor for a later round."
+  }
+]
