@@ -39,34 +39,31 @@ jobs:
 
           psql "$NEON_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
             SELECT COALESCE(
-              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.asking_price, x.address)),
+              jsonb_pretty(jsonb_agg(to_jsonb(x) ORDER BY x.price, x.address)),
               '[]'::jsonb
             )
             FROM (
               SELECT
-                property_id,
-                address,
-                city,
-                state,
-                postal_code,
-                listing_url,
-                listing_source,
-                property_type,
-                asking_price,
-                target_offer,
-                max_offer,
-                lot_rent_monthly,
-                land_owned,
-                bedrooms,
-                bathrooms,
-                sqft,
-                year_built,
-                status,
-                data_status,
-                source_checked_at,
-                notes
-              FROM properties
-              WHERE data_status IN ('LIVE','VERIFIED')
+                p.property_id AS \"propertyId\",
+                p.address,
+                trim(concat_ws(', ', p.city, p.state)) AS market,
+                p.property_type AS type,
+                p.asking_price AS price,
+                p.lot_rent_monthly AS \"lotRent\",
+                p.bedrooms AS beds,
+                p.bathrooms AS baths,
+                p.sqft,
+                p.year_built AS \"yearBuilt\",
+                p.listing_source AS source,
+                p.listing_url AS url,
+                p.data_status AS status,
+                p.source_checked_at AS \"sourceChecked\",
+                p.land_owned AS \"landOwned\",
+                p.target_offer AS \"targetOffer\",
+                p.max_offer AS \"maxOffer\",
+                p.notes AS note
+              FROM properties p
+              WHERE p.data_status IN ('LIVE','VERIFIED')
             ) x;
           " > data/properties.json
 
@@ -77,25 +74,25 @@ jobs:
             )
             FROM (
               SELECT
-                grant_id,
-                name,
-                agency,
-                program_url,
-                geography,
-                program_type,
-                max_amount,
-                funding_form,
-                applicant_requirements,
-                property_requirements,
-                stacking_notes,
-                application_status,
-                open_date,
-                close_date,
-                verified_at,
-                data_status,
-                notes
-              FROM grants
-              WHERE data_status = 'VERIFIED'
+                g.grant_id AS \"grantId\",
+                g.name,
+                g.agency,
+                g.program_url AS url,
+                g.geography,
+                g.program_type AS \"programType\",
+                g.max_amount AS \"maxAmount\",
+                g.funding_form AS \"fundingForm\",
+                g.applicant_requirements AS \"applicantRequirements\",
+                g.property_requirements AS \"propertyRequirements\",
+                g.stacking_notes AS \"stackingNotes\",
+                g.application_status AS \"applicationStatus\",
+                g.open_date AS \"openDate\",
+                g.close_date AS \"closeDate\",
+                g.verified_at AS \"verifiedAt\",
+                g.data_status AS \"dataStatus\",
+                g.notes AS note
+              FROM grants g
+              WHERE g.data_status = 'VERIFIED'
             ) x;
           " > data/grants.json
 
@@ -105,9 +102,18 @@ jobs:
               '[]'::jsonb
             )
             FROM (
-              SELECT market_id, name, state, region, market_type, latitude, longitude, data_status, notes
-              FROM markets
-              WHERE active = true AND data_status = 'VERIFIED'
+              SELECT
+                m.market_id AS \"marketId\",
+                m.name,
+                m.state,
+                m.region,
+                m.market_type AS \"marketType\",
+                m.latitude,
+                m.longitude,
+                m.data_status AS \"dataStatus\",
+                m.notes AS note
+              FROM markets m
+              WHERE m.active = true AND m.data_status = 'VERIFIED'
             ) x;
           " > data/markets.json
 
@@ -118,7 +124,7 @@ jobs:
           jq -n \
             --arg generated_at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
             --arg source "Neon Postgres" \
-            '{generated_at:$generated_at,source:$source,status:"verified-export"}' \
+            '{generatedAt:$generated_at,source:$source,status:"verified-export"}' \
             > data/sync-status.json
 
       - name: Commit changed data snapshots
